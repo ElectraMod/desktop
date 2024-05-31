@@ -1,0 +1,19 @@
+{
+  "name": "electramod-desktop",
+  "version": "1.0.0",
+  "description": "Desktop version of ElectraMod (without portalix launcher).",
+  "main": "index.js",
+  "scripts": {
+    "start": "electron .",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "electramod",
+    "desktop"
+  ],
+  "author": "Aness6040",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^30.0.9"
+  }
+}
