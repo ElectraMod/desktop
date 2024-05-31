@@ -1,5 +1,6 @@
 {
   "name": "electramod-desktop",
+  "productName": "ElectraMod Desktop",
   "version": "1.0.0",
   "description": "Desktop version of ElectraMod (without portalix launcher).",
   "main": "index.js",
