@@ -90,6 +90,8 @@ const updateActivity = async (win) => {
         }
       } else if (currentURL.includes('/scratch-gui/build/addons.html') || currentURL.includes('electramod.vercel.app/addons.html')) {
         setActivity('in Addons');
+      } else if (currentURL.includes('/packager/dist/') || currentURL.includes('electramod-packager.vercel.app/')) {
+        setActivity('in Packager');
       } else if (currentURL.includes('electramod-home.vercel.app')) {
         if (currentURL.includes('profile')) {
           if (currentURL.includes('profile?user=')) {
