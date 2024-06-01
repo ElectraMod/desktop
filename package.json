@@ -6,7 +6,9 @@
   "main": "index.js",
   "scripts": {
     "start": "electron .",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "load:gui": "node guiProcess.js",
+    "load:packager": "node packagerProcess.js"
   },
   "keywords": [
     "electramod",

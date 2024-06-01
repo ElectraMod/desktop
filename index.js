@@ -88,6 +88,21 @@ const updateActivity = async (win) => {
         } else {
           setActivity('in Editor', 'Code Editor');
         }
+      } else if (currentURL.includes('/scratch-gui/build/addons.html') || currentURL.includes('electramod.vercel.app/addons.html')) {
+        setActivity('in Addons');
+      } else if (currentURL.includes('electramod-home.vercel.app')) {
+        if (currentURL.includes('profile')) {
+          if (currentURL.includes('profile?user=')) {
+            const url = new URL(currentURL);
+            const params = new URLSearchParams(url.search);
+            const user = params.get('user');
+            setActivity(`looking at ${user}'s profile`);
+          } else {
+            setActivity('looking at a profile');
+          }
+        } else {
+          setActivity('in Home');
+        }
       }
       previousURL = currentURL;
     }
@@ -115,6 +130,21 @@ const configureWindow = (win) => {
     }
   });
 
+  const checkURL = () => {
+    const currentURL = win.webContents.getURL();
+    if (currentURL && currentURL.includes('electramod-packager.vercel.app')) {
+      win.loadURL('file://' + path.join(__dirname, 'packager', 'dist', 'index.html'));
+    }
+  };
+
+  // Vérifier l'URL de la fenêtre toutes les secondes
+  const intervalId = setInterval(checkURL, 1000);
+
+  // Arrêter l'intervalle lorsque la fenêtre est fermée
+  win.on('closed', () => {
+    clearInterval(intervalId);
+  });
+
   win.webContents.on('did-navigate-in-page', () => {
     updateActivity(win);
   });
@@ -123,6 +153,7 @@ const configureWindow = (win) => {
     updateActivity(win);
   });
 };
+
 
 // Fonction pour créer la fenêtre principale
 const createWindow = () => {
