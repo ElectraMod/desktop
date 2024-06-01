@@ -133,7 +133,15 @@ const configureWindow = (win) => {
   const checkURL = () => {
     const currentURL = win.webContents.getURL();
     if (currentURL && currentURL.includes('electramod-packager.vercel.app')) {
-      win.loadURL('file://' + path.join(__dirname, 'packager', 'dist', 'index.html'));
+      const url = new URL(currentURL);
+      const newURL = 'file://' + path.join(__dirname, 'packager', 'dist', 'index.html');
+      const finalURL = newURL + url.search + url.hash;
+      win.loadURL(finalURL);
+    } else if (currentURL && currentURL.includes('electramod.vercel.app')) {
+      const url = new URL(currentURL);
+      const newURL = 'file://' + path.join(__dirname, 'scratch-gui', 'build', 'index.html');
+      const finalURL = newURL + url.search + url.hash;
+      win.loadURL(finalURL);
     }
   };
 
