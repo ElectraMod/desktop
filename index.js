@@ -1,4 +1,3 @@
-// Importer les modules nécessaires
 const { app, BrowserWindow } = require('electron');
 const path = require('path');
 const RPC = require('discord-rpc');
@@ -16,7 +15,6 @@ const extractHashNumbers = (url) => {
   const match = url.match(regex);
   return match ? Number(match[1]) : null;
 };
-
 
 function fetchEMAPIProject(id) {
   const url = 'https://projects.mubi.tech/api/projects/search?project';
@@ -42,14 +40,14 @@ function fetchEMAPIProject(id) {
     });
 }
 
-
 // Définir les activités
+let startTimestamp = new Date();
 const setActivity = (details, state) => {
   rpc.setActivity({
     details: details,
     state: state,
-    startTimestamp: new Date(),
-    largeImageKey: 'icon', // Configurez cela dans l'application Discord Developer
+    startTimestamp: startTimestamp,
+    largeImageKey: 'icon',
     largeImageText: 'ElectraMod',
     instance: false,
   });
@@ -58,37 +56,26 @@ const setActivity = (details, state) => {
 // Event 'ready' du client RPC
 rpc.on('ready', () => {
   console.log('Discord RPC is now active');
+  setActivity('Starting', 'Initializing');
 });
 
 // Connexion à Discord
 rpc.login({ clientId }).catch(console.error);
 
-// Fonction pour configurer une fenêtre
-const configureWindow = (win) => {
-  win.setMenuBarVisibility(false);
-};
 
-// Fonction pour créer la fenêtre principale
-const createWindow = () => {
-  const mainWindow = new BrowserWindow({
-    width: 960,
-    height: 600,
-    icon: path.join(__dirname, 'assets', 'icon', 'icon.png'),
-    webPreferences: {
-      devTools: true,
-    }
-  });
+// Définir updateActivity dans le scope global
+let previousURL = '';
 
-  let previousURL = '';
-
-  const updateActivity = async (url) => {
-    if (url !== previousURL) {
-      console.log('changed page!', url);
-      if (url.includes('/build/index.html')) {
-        if (url.includes('#')) {
-          if (!url.includes('#0')) {
-            const projectId = extractHashNumbers(url);
-            const project = await fetchEMAPIProject(projectId); // Attendre la résolution de la promesse
+const updateActivity = async (win) => {
+  if (!win.isDestroyed()) {
+    const currentURL = win.webContents.getURL();
+    if (currentURL !== previousURL) {
+      console.log('changed page!', currentURL);
+      if (currentURL.includes('/build/index.html') || currentURL.includes('electramod.vercel.app/')) {
+        if (currentURL.includes('#')) {
+          if (!currentURL.includes('#0')) {
+            const projectId = extractHashNumbers(currentURL);
+            const project = await fetchEMAPIProject(projectId);
             if (project) {
               setActivity(`Plays ${project.name}`, `by ${project.owner}`);
             } else {
@@ -102,16 +89,51 @@ const createWindow = () => {
           setActivity('in Editor', 'Code Editor');
         }
       }
-      previousURL = url;
+      previousURL = currentURL;
     }
-  };
-  
+  }
+};
 
-  // Utiliser setInterval pour vérifier l'URL actuelle toutes les secondes
-  setInterval(() => {
-    const currentURL = mainWindow.webContents.getURL();
-    updateActivity(currentURL);
-  }, 1000);
+// Fonction pour configurer une fenêtre
+const configureWindow = (win) => {
+  win.setMenuBarVisibility(false);
+
+  win.webContents.on('page-title-updated', (event, title) => {
+    let newTitle = title;
+    if (title.startsWith('ElectraMod -')) {
+      newTitle = title.replace('ElectraMod -', 'ElectraMod Desktop -');
+    } else if (title.endsWith('- ElectraMod')) {
+      newTitle = title.replace('- ElectraMod', '- ElectraMod Desktop');
+    } else if (title.startsWith('PenguinMod -')) {
+      newTitle = title.replace('PenguinMod -', 'ElectraMod Desktop -');
+    } else if (title.endsWith('- PenguinMod')) {
+      newTitle = title.replace('- PenguinMod', '- ElectraMod Desktop');
+    }
+    if (newTitle !== title) {
+      event.preventDefault(); // Prevent default title update
+      win.setTitle(newTitle);  // Update with the new title
+    }
+  });
+
+  win.webContents.on('did-navigate-in-page', () => {
+    updateActivity(win);
+  });
+
+  win.on('focus', () => {
+    updateActivity(win);
+  });
+};
+
+// Fonction pour créer la fenêtre principale
+const createWindow = () => {
+  const mainWindow = new BrowserWindow({
+    width: 960,
+    height: 600,
+    icon: path.join(__dirname, 'assets', 'icon', 'icon.png'),
+    webPreferences: {
+      devTools: true,
+    }
+  });
 
   mainWindow.loadFile('build/index.html');
   configureWindow(mainWindow);
