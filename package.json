@@ -6,6 +6,7 @@
   "main": "index.js",
   "scripts": {
     "start": "electron .",
+    "pack": "electron-builder",
     "test": "echo \"Error: no test specified\" && exit 1",
     "load:gui": "node guiProcess.js",
     "load:packager": "node packagerProcess.js"
@@ -16,8 +17,26 @@
   ],
   "author": "Aness6040",
   "license": "MIT",
+  "build": {
+    "appId": "com.portalix.electramod-desktop",
+    "linux": {
+      "target": [
+        "snap",
+        "AppImage",
+        "deb",
+        "rpm"
+      ]
+    },
+    "win": {
+      "icon": "assets/icon/icon.ico"
+    },
+    "mac": {
+      "icon": "assets/icon/icon.icns"
+    }
+  },   
   "devDependencies": {
-    "electron": "^30.0.9"
+    "electron": "^30.0.9",
+    "electron-builder": "^24.13.3"
   },
   "dependencies": {
     "axios": "^1.7.2",
