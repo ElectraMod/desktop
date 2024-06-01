@@ -71,7 +71,7 @@ const updateActivity = async (win) => {
     const currentURL = win.webContents.getURL();
     if (currentURL !== previousURL) {
       console.log('changed page!', currentURL);
-      if (currentURL.includes('/build/index.html') || currentURL.includes('electramod.vercel.app/')) {
+      if (currentURL.includes('/scratch-gui/build/index.html') || currentURL.includes('electramod.vercel.app/')) {
         if (currentURL.includes('#')) {
           if (!currentURL.includes('#0')) {
             const projectId = extractHashNumbers(currentURL);
@@ -135,7 +135,7 @@ const createWindow = () => {
     }
   });
 
-  mainWindow.loadFile('build/index.html');
+  mainWindow.loadFile('scratch-gui/build/index.html');
   configureWindow(mainWindow);
 
   // Gérer les nouvelles fenêtres (popups, etc.)
